@@ -29,6 +29,13 @@ def normalized(a, axis=-1, order=2):
     l2[l2==0] = 1
     return a / np.expand_dims(l2, axis)
 
+def GetAcceleration(body1, body2):
+    sqrDist = SqrDistanceBetween(body2.pos, body1.pos)
+    forceDir = normalized(body2.pos - body1.pos)
+    force = forceDir * G * body1.mass * body2.mass / sqrDist
+    acceleration = force * body1.mass
+    return acceleration
+
 class Body(object):
     def __init__(self, mass, size, pos, vel):
         self.mass = mass
@@ -59,7 +66,29 @@ bodies.append(Body(15, 14, array([500.0, 500.0]), array([0.0, 12.0])))
 bodies.append(Body(22, 20, array([200.0, 500.0]), array([0.0, 12.0])))
 
 
+predictionBodies = []
+predictionBodies.append(Body(15, 14, array([500.0, 500.0]), array([0.0, 12.0])))
+predictionBodies.append(Body(22, 20, array([200.0, 500.0]), array([0.0, 12.0])))
+predictionPoints = {}
+seconds = 120
 
+for pb in range(len(predictionBodies)):
+    predictionPoints[pb] = []
+
+print(predictionPoints)
+
+for i in range(50 * seconds):
+    for pb in range(len(predictionBodies)):
+        predictionBodies[pb].UpdateVelocity(sun)
+        for pb2 in predictionBodies:
+            if predictionBodies[pb] != pb2:
+                predictionBodies[pb].UpdateVelocity(pb2)
+        predictionBodies[pb].UpdatePosition()
+        predictionPoints[pb].append((predictionBodies[pb].pos[0], predictionBodies[pb].pos[1]))
+
+
+
+# Main Loop
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -68,6 +97,12 @@ while running:
     screen.fill(black)
 
     sun.Draw(screen)
+
+    for p in range(len(predictionPoints)):
+        #print(predictionPoints[p][0])
+        for i in range(1, len(predictionPoints[p])):
+            pygame.draw.line(screen, bodies[p].color, predictionPoints[p][i-1], predictionPoints[p][i])
+
 
     for b in bodies:
         b.UpdateVelocity(sun)
