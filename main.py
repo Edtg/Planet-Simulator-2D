@@ -19,7 +19,7 @@ clock = pygame.time.Clock()
 
 bodies = []
 #G = 0.0000000000674
-G = 0.05
+G = 5
 
 def SqrDistanceBetween(pos1, pos2):
     return ((pos1[0] - pos2[0])**2 + (pos1[1] - pos2[1])**2)
@@ -64,14 +64,14 @@ class Body(object):
         pygame.draw.line(surface, (255, 0, 0), self.pos, self.pos + (self.vel * 5))
 
 
-sun = Body(400, 30, array([800.0, 500.0]), array([0.0, 0.0]), (255, 255, 0))
-bodies.append(Body(15, 14, array([500.0, 500.0]), array([0.0, 12.0])))
-bodies.append(Body(22, 20, array([200.0, 500.0]), array([0.0, 12.0])))
+sun = Body(1000, 40, array([800.0, 500.0]), array([0.0, 0.0]), (255, 255, 0))
+bodies.append(Body(1, 10, array([500.0, 500.0]), array([0.0, 12.5])))
+bodies.append(Body(2, 20, array([200.0, 500.0]), array([0.0, 18.0])))
 
 
 predictionBodies = []
-predictionBodies.append(Body(15, 14, array([500.0, 500.0]), array([0.0, 12.0])))
-predictionBodies.append(Body(22, 20, array([200.0, 500.0]), array([0.0, 12.0])))
+predictionBodies.append(Body(1, 10, array([500.0, 500.0]), array([0.0, 12.5])))
+predictionBodies.append(Body(2, 20, array([200.0, 500.0]), array([0.0, 18.0])))
 predictionPoints = {}
 seconds = 120
 
