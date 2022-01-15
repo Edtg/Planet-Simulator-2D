@@ -37,12 +37,15 @@ def GetAcceleration(body1, body2):
     return acceleration
 
 class Body(object):
-    def __init__(self, mass, size, pos, vel):
+    def __init__(self, mass, size, pos, vel, color=(0,0,0)):
         self.mass = mass
         self.size = size
         self.pos = pos
         self.vel = vel
-        self.color = (random.randrange(30, 255), random.randrange(30, 255), random.randrange(30, 255))
+        if color == (0,0,0):
+            self.color = (random.randrange(30, 255), random.randrange(30, 255), random.randrange(30, 255))
+        else:
+            self.color = color
     
     def Draw(self, surface):
         pygame.draw.circle(surface, self.color, self.pos, self.size)
@@ -61,7 +64,7 @@ class Body(object):
         pygame.draw.line(surface, (255, 0, 0), self.pos, self.pos + (self.vel * 5))
 
 
-sun = Body(400, 30, array([800.0, 500.0]), array([0.0, 0.0]))
+sun = Body(400, 30, array([800.0, 500.0]), array([0.0, 0.0]), (255, 255, 0))
 bodies.append(Body(15, 14, array([500.0, 500.0]), array([0.0, 12.0])))
 bodies.append(Body(22, 20, array([200.0, 500.0]), array([0.0, 12.0])))
 
