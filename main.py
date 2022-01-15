@@ -1,5 +1,7 @@
 import pygame, math, numpy as np, json, os, random, copy
 from numpy import array
+import tkinter as tk
+from tkinter import filedialog
 pygame.init()
 
 size = width, height = 1920, 1080
@@ -22,6 +24,10 @@ predictionPoints = {}
 #G = 0.0000000000674
 G = 5
 
+#---------------------------------------
+# Helper functions
+#---------------------------------------
+
 def SqrDistanceBetween(pos1, pos2):
     return ((pos1[0] - pos2[0])**2 + (pos1[1] - pos2[1])**2)
 
@@ -37,6 +43,9 @@ def GetAcceleration(body1, body2):
     acceleration = force * body1.mass
     return acceleration
 
+#---------------------------------------
+# Body class
+#---------------------------------------
 class Body(object):
     def __init__(self, mass, size, pos, vel, color=(0,0,0)):
         self.mass = mass
@@ -64,11 +73,9 @@ class Body(object):
     def DrawVelocity(self, surface):
         pygame.draw.line(surface, (255, 0, 0), self.pos, self.pos + (self.vel * 5))
 
-
-sun = Body(1000, 40, array([800.0, 500.0]), array([0.0, 0.0]), (255, 255, 0))
-bodies.append(Body(1, 10, array([500.0, 500.0]), array([0.0, 12.5])))
-bodies.append(Body(2, 20, array([200.0, 500.0]), array([0.0, 18.0])))
-
+#---------------------------------------
+# Predicted path function
+#---------------------------------------
 
 def GeneratePredictedPaths():
     predictionBodies = []
@@ -89,7 +96,20 @@ def GeneratePredictedPaths():
             predictionBodies[pb].UpdatePosition()
             predictionPoints[pb].append((predictionBodies[pb].pos[0], predictionBodies[pb].pos[1]))
 
+
+#---------------------------------------
+# Main Stuff
+#---------------------------------------
+
+sun = Body(1000, 40, array([800.0, 500.0]), array([0.0, 0.0]), (255, 255, 0))
+bodies.append(Body(1, 10, array([500.0, 500.0]), array([0.0, 12.5])))
+bodies.append(Body(2, 20, array([200.0, 500.0]), array([0.0, 18.0])))
+
 GeneratePredictedPaths()
+
+# Hide tkinter window
+root = tk.Tk()
+root.withdraw()
 
 # Main Loop
 while running:
