@@ -1,6 +1,5 @@
-import pygame, math, numpy as np, json, os, random
+import pygame, math, numpy as np, json, os, random, copy
 from numpy import array
-from pygame.constants import K_r
 pygame.init()
 
 size = width, height = 1920, 1080
@@ -14,10 +13,12 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Planet Simulator")
 
 running = True
+paused = False
 FPS = 60
 clock = pygame.time.Clock()
 
 bodies = []
+predictionPoints = {}
 #G = 0.0000000000674
 G = 5
 
@@ -69,50 +70,53 @@ bodies.append(Body(1, 10, array([500.0, 500.0]), array([0.0, 12.5])))
 bodies.append(Body(2, 20, array([200.0, 500.0]), array([0.0, 18.0])))
 
 
-predictionBodies = []
-predictionBodies.append(Body(1, 10, array([500.0, 500.0]), array([0.0, 12.5])))
-predictionBodies.append(Body(2, 20, array([200.0, 500.0]), array([0.0, 18.0])))
-predictionPoints = {}
-seconds = 120
+def GeneratePredictedPaths():
+    predictionBodies = []
+    for b in bodies:
+        predictionBodies.append(copy.deepcopy(b))
 
-for pb in range(len(predictionBodies)):
-    predictionPoints[pb] = []
+    seconds = 120
 
-print(predictionPoints)
-
-for i in range(50 * seconds):
     for pb in range(len(predictionBodies)):
-        predictionBodies[pb].UpdateVelocity(sun)
-        for pb2 in predictionBodies:
-            if predictionBodies[pb] != pb2:
-                predictionBodies[pb].UpdateVelocity(pb2)
-        predictionBodies[pb].UpdatePosition()
-        predictionPoints[pb].append((predictionBodies[pb].pos[0], predictionBodies[pb].pos[1]))
+        predictionPoints[pb] = []
 
+    for i in range(50 * seconds):
+        for pb in range(len(predictionBodies)):
+            predictionBodies[pb].UpdateVelocity(sun)
+            for pb2 in predictionBodies:
+                if predictionBodies[pb] != pb2:
+                    predictionBodies[pb].UpdateVelocity(pb2)
+            predictionBodies[pb].UpdatePosition()
+            predictionPoints[pb].append((predictionBodies[pb].pos[0], predictionBodies[pb].pos[1]))
 
+GeneratePredictedPaths()
 
 # Main Loop
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_r:
+                GeneratePredictedPaths()
+            elif event.key == pygame.K_p:
+                paused = not paused
     
     screen.fill(black)
 
     sun.Draw(screen)
 
     for p in range(len(predictionPoints)):
-        #print(predictionPoints[p][0])
         for i in range(1, len(predictionPoints[p])):
             pygame.draw.line(screen, bodies[p].color, predictionPoints[p][i-1], predictionPoints[p][i])
 
-
     for b in bodies:
-        b.UpdateVelocity(sun)
-        for b2 in bodies:
-            if b != b2:
-                b.UpdateVelocity(b2)
-        b.UpdatePosition()
+        if not paused:
+            b.UpdateVelocity(sun)
+            for b2 in bodies:
+                if b != b2:
+                    b.UpdateVelocity(b2)
+            b.UpdatePosition()
         b.Draw(screen)
         b.DrawVelocity(screen)
     
